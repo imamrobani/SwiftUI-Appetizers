@@ -10,7 +10,6 @@ import SwiftUI
 struct OrderView: View {
     
     @EnvironmentObject var order: Order
-    @State private var orderItems = MockData.orderItems
     
     var body: some View {
         NavigationView {
@@ -27,8 +26,10 @@ struct OrderView: View {
                     Button {
                         print("oder button")
                     } label: {
-                        APButton(title: "$\(order.totalPrice, specifier: "%.2f") - Place Order")
+//                        APButton(title: "$\(order.totalPrice, specifier: "%.2f") - Place Order")
+                        Text("$\(order.totalPrice, specifier: "%.2f") - Place Order")
                     }
+                    .modifier(StandarButtonStyle())
                 }
                 
                 if order.items.isEmpty {
@@ -39,11 +40,6 @@ struct OrderView: View {
             .navigationTitle("🧾 Appetizers")
         }
     }
-    
-    func deleteItem(at offsets: IndexSet) {
-        orderItems.remove(atOffsets: offsets)
-    }
-    
 }
 
 #Preview {
