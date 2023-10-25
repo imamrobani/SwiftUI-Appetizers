@@ -10,17 +10,34 @@ import SwiftUI
 struct AccountView: View {
     
     @StateObject var viewModel = AccountViewModel()
+    @FocusState private var focusedTextField: FormTextField?
+    
+    enum FormTextField {
+        case firstName, lastName, email
+    }
     
     var body: some View {
         NavigationView {
             Form {
                 Section(header: Text("Personal Info")) {
                     TextField("First Name", text: $viewModel.user.firstName)
+                        .focused($focusedTextField, equals: .firstName)
+                        .onSubmit { focusedTextField = .lastName }
+                        .submitLabel(.next)
+                    
                     TextField("Last Name", text: $viewModel.user.lastName)
+                        .focused($focusedTextField, equals: .lastName)
+                        .onSubmit { focusedTextField = .email }
+                        .submitLabel(.next)
+                    
                     TextField("Email", text: $viewModel.user.email)
+                        .focused($focusedTextField, equals: .email)
+                        .onSubmit { focusedTextField = nil }
+                        .submitLabel(.continue)
                         .keyboardType(.emailAddress)
                         .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)
                         .disableAutocorrection(/*@START_MENU_TOKEN@*/false/*@END_MENU_TOKEN@*/)
+                    
                     DatePicker("Birthday", selection: $viewModel.user.birthdate,
                                displayedComponents: .date)
                     Button {
@@ -36,10 +53,15 @@ struct AccountView: View {
                 }
                 .toggleStyle(SwitchToggleStyle(tint: .brandPrimary))
             }
-            .onAppear {
-                viewModel.retriveUser()
-            }
             .navigationTitle("😀 Account")
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Button("Dismiss") { focusedTextField = nil }
+                }
+            }
+        }
+        .onAppear {
+            viewModel.retriveUser()
         }
         .alert(item: $viewModel.alertItem) { alertItem in
             Alert(title: alertItem.title,
